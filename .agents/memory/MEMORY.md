@@ -1,0 +1,1 @@
+- [API schema generation](api-schema-generation.md) — Keep Orval's Zod output pinned to the workspace's installed Zod major version.

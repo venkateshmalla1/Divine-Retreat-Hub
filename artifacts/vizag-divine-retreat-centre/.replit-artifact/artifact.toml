@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "Vizag Divine Retreat Centre"
+description = "A welcoming retreat-centre platform for discovering spiritual retreats, registering for programs, submitting prayer requests, making donations, managing accommodation, and supporting staff operations."
+version = "1.0.0"
+id = "artifacts/vizag-divine-retreat-centre"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 25841
+
+[services.development]
+run = "pnpm --filter @workspace/vizag-divine-retreat-centre run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/vizag-divine-retreat-centre", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/vizag-divine-retreat-centre/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "25841"
+BASE_PATH = "/"

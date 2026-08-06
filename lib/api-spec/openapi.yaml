@@ -10,6 +10,22 @@ servers:
 tags:
   - name: health
     description: Health operations
+  - name: retreats
+    description: Retreat discovery and details
+  - name: registrations
+    description: Participant retreat registrations
+  - name: prayer
+    description: Prayer requests
+  - name: donations
+    description: Donations
+  - name: accommodation
+    description: Participant accommodation
+  - name: participant
+    description: Participant dashboard and certificates
+  - name: content
+    description: Public centre content
+  - name: admin
+    description: Centre operations
 paths:
   /healthz:
     get:
@@ -24,7 +40,380 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+  /retreats:
+    get:
+      operationId: listRetreats
+      tags: [retreats]
+      summary: List retreats
+      parameters:
+        - name: status
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [upcoming, completed, all]
+            default: upcoming
+        - name: search
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Retreats
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Retreat"
+    post:
+      operationId: createRetreat
+      tags: [admin]
+      summary: Create a retreat
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RetreatInput"
+      responses:
+        "201":
+          description: Created retreat
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Retreat"
+  /retreats/{id}:
+    get:
+      operationId: getRetreat
+      tags: [retreats]
+      summary: Get a retreat
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      responses:
+        "200":
+          description: Retreat
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Retreat"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    patch:
+      operationId: updateRetreat
+      tags: [admin]
+      summary: Update a retreat
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RetreatUpdate"
+      responses:
+        "200":
+          description: Updated retreat
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Retreat"
+  /registrations:
+    get:
+      operationId: listRegistrations
+      tags: [registrations, admin]
+      summary: List registrations
+      parameters:
+        - name: email
+          in: query
+          required: false
+          schema:
+            type: string
+            format: email
+        - name: status
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [pending, confirmed, attended, cancelled, all]
+            default: all
+      responses:
+        "200":
+          description: Registrations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Registration"
+    post:
+      operationId: createRegistration
+      tags: [registrations]
+      summary: Register for a retreat
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegistrationInput"
+      responses:
+        "201":
+          description: Registration
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Registration"
+  /registrations/{id}/status:
+    patch:
+      operationId: updateRegistrationStatus
+      tags: [admin]
+      summary: Update registration status
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegistrationStatusInput"
+      responses:
+        "200":
+          description: Registration
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Registration"
+  /prayer-requests:
+    get:
+      operationId: listPrayerRequests
+      tags: [prayer]
+      summary: List prayer requests
+      parameters:
+        - name: email
+          in: query
+          required: false
+          schema:
+            type: string
+            format: email
+      responses:
+        "200":
+          description: Prayer requests
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PrayerRequest"
+    post:
+      operationId: createPrayerRequest
+      tags: [prayer]
+      summary: Submit a prayer request
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PrayerRequestInput"
+      responses:
+        "201":
+          description: Prayer request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PrayerRequest"
+  /donations:
+    post:
+      operationId: createDonation
+      tags: [donations]
+      summary: Record a donation pledge
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DonationInput"
+      responses:
+        "201":
+          description: Donation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Donation"
+    get:
+      operationId: listDonations
+      tags: [donations, admin]
+      summary: List donations
+      responses:
+        "200":
+          description: Donations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Donation"
+  /accommodations:
+    get:
+      operationId: getAccommodation
+      tags: [accommodation]
+      summary: Get accommodation for a registration
+      parameters:
+        - name: registrationId
+          in: query
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Accommodation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Accommodation"
+    post:
+      operationId: createAccommodation
+      tags: [accommodation]
+      summary: Request accommodation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AccommodationInput"
+      responses:
+        "201":
+          description: Accommodation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Accommodation"
+  /dashboard/summary:
+    get:
+      operationId: getDashboardSummary
+      tags: [participant]
+      summary: Get participant dashboard summary
+      parameters:
+        - name: email
+          in: query
+          required: true
+          schema:
+            type: string
+            format: email
+      responses:
+        "200":
+          description: Dashboard summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardSummary"
+  /certificates:
+    get:
+      operationId: listCertificates
+      tags: [participant]
+      summary: List participant certificates
+      parameters:
+        - name: email
+          in: query
+          required: true
+          schema:
+            type: string
+            format: email
+      responses:
+        "200":
+          description: Certificates
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Certificate"
+  /announcements:
+    get:
+      operationId: listAnnouncements
+      tags: [content, admin]
+      summary: List announcements
+      responses:
+        "200":
+          description: Announcements
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Announcement"
+    post:
+      operationId: createAnnouncement
+      tags: [admin]
+      summary: Create an announcement
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AnnouncementInput"
+      responses:
+        "201":
+          description: Announcement
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Announcement"
+  /gallery:
+    get:
+      operationId: listGalleryItems
+      tags: [content]
+      summary: List gallery items
+      responses:
+        "200":
+          description: Gallery items
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/GalleryItem"
+  /events:
+    get:
+      operationId: listEvents
+      tags: [content]
+      summary: List upcoming events
+      responses:
+        "200":
+          description: Events
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Event"
+  /admin/summary:
+    get:
+      operationId: getAdminSummary
+      tags: [admin]
+      summary: Get admin overview
+      responses:
+        "200":
+          description: Admin summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminSummary"
 components:
+  parameters:
+    Id:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+  responses:
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
   schemas:
     HealthStatus:
       type: object
@@ -33,4 +422,198 @@ components:
           type: string
       required:
         - status
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+      required: [error]
+    Retreat:
+      type: object
+      required: [id, title, slug, description, startDate, endDate, location, capacity, enrolled, price, status, spiritualTheme, imageUrl]
+      properties:
+        id: { type: integer }
+        title: { type: string }
+        slug: { type: string }
+        description: { type: string }
+        startDate: { type: string, format: date }
+        endDate: { type: string, format: date }
+        location: { type: string }
+        capacity: { type: integer }
+        enrolled: { type: integer }
+        price: { type: number }
+        status: { type: string, enum: [upcoming, completed] }
+        spiritualTheme: { type: string }
+        imageUrl: { type: string }
+    RetreatInput:
+      type: object
+      required: [title, slug, description, startDate, endDate, location, capacity, price, spiritualTheme, imageUrl]
+      properties:
+        title: { type: string }
+        slug: { type: string }
+        description: { type: string }
+        startDate: { type: string, format: date }
+        endDate: { type: string, format: date }
+        location: { type: string }
+        capacity: { type: integer }
+        price: { type: number }
+        spiritualTheme: { type: string }
+        imageUrl: { type: string }
+    RetreatUpdate:
+      allOf:
+        - $ref: "#/components/schemas/RetreatInput"
+    Registration:
+      type: object
+      required: [id, retreatId, retreatTitle, fullName, email, phone, guests, status, createdAt]
+      properties:
+        id: { type: integer }
+        retreatId: { type: integer }
+        retreatTitle: { type: string }
+        fullName: { type: string }
+        email: { type: string, format: email }
+        phone: { type: string }
+        guests: { type: integer }
+        status: { type: string, enum: [pending, confirmed, attended, cancelled] }
+        createdAt: { type: string, format: date-time }
+    RegistrationInput:
+      type: object
+      required: [retreatId, fullName, email, phone, guests]
+      properties:
+        retreatId: { type: integer }
+        fullName: { type: string }
+        email: { type: string, format: email }
+        phone: { type: string }
+        guests: { type: integer, minimum: 1, maximum: 10 }
+    RegistrationStatusInput:
+      type: object
+      required: [status]
+      properties:
+        status: { type: string, enum: [pending, confirmed, attended, cancelled] }
+    PrayerRequest:
+      type: object
+      required: [id, fullName, email, request, isAnonymous, status, createdAt]
+      properties:
+        id: { type: integer }
+        fullName: { type: string }
+        email: { type: string, format: email }
+        request: { type: string }
+        isAnonymous: { type: boolean }
+        status: { type: string, enum: [new, praying, answered] }
+        createdAt: { type: string, format: date-time }
+    PrayerRequestInput:
+      type: object
+      required: [fullName, email, request, isAnonymous]
+      properties:
+        fullName: { type: string }
+        email: { type: string, format: email }
+        request: { type: string, minLength: 10 }
+        isAnonymous: { type: boolean }
+    Donation:
+      type: object
+      required: [id, donorName, email, amount, purpose, status, createdAt]
+      properties:
+        id: { type: integer }
+        donorName: { type: string }
+        email: { type: string, format: email }
+        amount: { type: number }
+        purpose: { type: string }
+        status: { type: string, enum: [pledged, received] }
+        createdAt: { type: string, format: date-time }
+    DonationInput:
+      type: object
+      required: [donorName, email, amount, purpose]
+      properties:
+        donorName: { type: string }
+        email: { type: string, format: email }
+        amount: { type: number, minimum: 1 }
+        purpose: { type: string }
+    Accommodation:
+      type: object
+      required: [id, registrationId, roomType, nights, status, notes]
+      properties:
+        id: { type: integer }
+        registrationId: { type: integer }
+        roomType: { type: string, enum: [shared, private, family] }
+        nights: { type: integer }
+        status: { type: string, enum: [requested, assigned, unavailable] }
+        notes: { type: string }
+    AccommodationInput:
+      type: object
+      required: [registrationId, roomType, nights]
+      properties:
+        registrationId: { type: integer }
+        roomType: { type: string, enum: [shared, private, family] }
+        nights: { type: integer, minimum: 1, maximum: 30 }
+        notes: { type: string }
+    DashboardSummary:
+      type: object
+      required: [participantName, nextRetreat, totalRetreats, prayerCount, certificateCount, notifications]
+      properties:
+        participantName: { type: string }
+        nextRetreat:
+          anyOf:
+            - $ref: "#/components/schemas/Registration"
+            - type: "null"
+        totalRetreats: { type: integer }
+        prayerCount: { type: integer }
+        certificateCount: { type: integer }
+        notifications: { type: integer }
+    Certificate:
+      type: object
+      required: [id, retreatTitle, issueDate, certificateNumber, downloadUrl]
+      properties:
+        id: { type: integer }
+        retreatTitle: { type: string }
+        issueDate: { type: string, format: date }
+        certificateNumber: { type: string }
+        downloadUrl: { type: string }
+    Announcement:
+      type: object
+      required: [id, title, body, category, publishedAt, isPinned]
+      properties:
+        id: { type: integer }
+        title: { type: string }
+        body: { type: string }
+        category: { type: string }
+        publishedAt: { type: string, format: date-time }
+        isPinned: { type: boolean }
+    AnnouncementInput:
+      type: object
+      required: [title, body, category, isPinned]
+      properties:
+        title: { type: string }
+        body: { type: string }
+        category: { type: string }
+        isPinned: { type: boolean }
+    GalleryItem:
+      type: object
+      required: [id, title, imageUrl, category]
+      properties:
+        id: { type: integer }
+        title: { type: string }
+        imageUrl: { type: string }
+        category: { type: string }
+    Event:
+      type: object
+      required: [id, title, date, time, location, category]
+      properties:
+        id: { type: integer }
+        title: { type: string }
+        date: { type: string, format: date }
+        time: { type: string }
+        location: { type: string }
+        category: { type: string }
+    AdminSummary:
+      type: object
+      required: [upcomingRetreats, totalRegistrations, pendingPrayers, donationsThisMonth, occupancyRate, recentRegistrations]
+      properties:
+        upcomingRetreats: { type: integer }
+        totalRegistrations: { type: integer }
+        pendingPrayers: { type: integer }
+        donationsThisMonth: { type: number }
+        occupancyRate: { type: number }
+        recentRegistrations:
+          type: array
+          items:
+            $ref: "#/components/schemas/Registration"
 

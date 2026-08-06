@@ -1,6 +1,6 @@
-# [Project name]
+# Vizag Divine Retreat Centre
 
-_Replace the heading above with the project's name, and this line with one sentence describing what this app does for users._
+An inviting retreat-centre platform for discovering spiritual retreats, registering for programs, sharing prayer requests, supporting the centre, and coordinating participant and staff operations.
 
 ## Run & Operate
 
@@ -22,23 +22,32 @@ _Replace the heading above with the project's name, and this line with one sente
 
 ## Where things live
 
-_Populate as you build — short repo map plus pointers to the source-of-truth file for DB schema, API contracts, theme files, etc._
+- `artifacts/vizag-divine-retreat-centre/src/App.tsx` — public, participant, and staff routes
+- `artifacts/vizag-divine-retreat-centre/src/index.css` — shared coastal editorial visual system
+- `lib/api-spec/openapi.yaml` — source of truth for retreat-centre API contracts
+- `artifacts/api-server/src/routes/retreatCentre.ts` — retreat-centre API handlers
+- `artifacts/api-server/src/lib/retreatCentreStore.ts` — seeded persistent MVP record store
+- `lib/db/src/schema/retreatCentreRecords.ts` — database schema for persistent records
 
 ## Architecture decisions
 
-_Populate as you build — non-obvious choices a reader couldn't infer from the code (3-5 bullets)._
+- The MVP uses a single typed records table for the retreat-centre domain so new centre modules can evolve without an early migration maze.
+- The OpenAPI contract is generated into shared React Query and Zod clients; frontend and backend use the same schemas.
+- Public, participant, and staff workspaces share the same visual language but use distinct navigation and density.
+- Seeded records keep the first experience populated while all create and update flows persist to PostgreSQL.
 
 ## Product
 
-_Describe the high-level user-facing capabilities of this app once they exist._
+The MVP includes public retreat discovery and registration, prayer requests, donations, gallery and events, a participant dashboard with accommodation and certificates, and a staff workspace for retreats, registrations, prayers, donations, announcements, and summary metrics.
 
 ## User preferences
 
-_Populate as you build — explicit user instructions worth remembering across sessions._
+No explicit user preferences recorded.
 
 ## Gotchas
 
-_Populate as you build — sharp edges, "always run X before Y" rules._
+- Run `pnpm --filter @workspace/api-spec run codegen` after OpenAPI changes.
+- Run Vite builds with workflow-provided `PORT` and `BASE_PATH`; the app config intentionally rejects bare shell builds without them.
 
 ## Pointers
 
